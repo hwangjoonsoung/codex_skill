@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auto Implement"
+  short_description: "Automate dependency-aware ticket implementation."
+  default_prompt: "Use $auto-impl to turn these requirements into tickets, plan dependencies, implement, verify, and integrate them for one final review."
