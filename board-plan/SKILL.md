@@ -1,6 +1,6 @@
 ---
 name: board-plan
-model:
+model: gpt-sol
 description: feature-board 게시글 id 를 받아 Run 2(워크플로우 4→9단계)를 수행하는 board 연동 래퍼. 선택된 confirmation 을 티켓 §8 에 반영하고 CONFIRMATION_COMPLETE 로 전이한 뒤, ticket_path 로 /plan-impl 체인을 실행하며 PLANNING→IMPLEMENT→VERIFY→USER_VERIFY 각 phase 를 board status 로 PATCH 한다(verify 커밋이 체인 종단, 보고서/FINALIZE 없음. COMMIT 은 승인 후 수동 /merge-impl). 기존 plan-impl 은 고치지 않고 감싼다(wrap). 설계 SSOT=BOARD_SKILL_DESIGN.md.
 ---
 

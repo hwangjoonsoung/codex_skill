@@ -1,6 +1,6 @@
 ---
 name: plan-impl
-model:
+model: gpt-sol
 description: "티켓(파일 경로=단건 / 디렉토리 경로=N건)을 받아, 메인 세션이 사전 문서를 직접 읽지 않고 티켓당 architect 에이전트를 병렬 spawn 해 plan.md 를 생성한 뒤, api/front 는 engineer(backend_engineer/frontend_engineer)를 병렬 batch 로·fullstack 은 순차로 직접 spawn 하고, verify 를 티켓별 순차로 체이닝하는 thin 오케스트레이터(verify 가 _verify.md 를 커밋하면 종단). 메인 세션은 티켓/plan 커밋과 worktree 관리만 직접 수행하고 코드/사전문서는 건드리지 않는다. `--no-chain` 으로 plan 생성까지만 수행한다. 사실상 부재중인 /auto-impl 라우터 역할을 plan-impl 이 담당한다."
 ---
 

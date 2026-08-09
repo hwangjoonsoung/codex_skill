@@ -1,6 +1,6 @@
 ---
 name: commit-impl
-model:
+model: gpt-sol
 description: (자동 파이프라인에서 제외됨 — /finalize-impl 을 단독 호출한 뒤에만 이어서 호출) /finalize-impl 이 작성한 _report.md 를 release_manager 에이전트를 commit phase·비격리로 spawn 해 보고서 1커밋만 시키는 thin wrapper(체인 종단). verify→finalize→commit 자동 체인의 끝으로 호출되거나 사용자 "검증완료" 후 단독 호출된다. 검증 행은 이미 finalize 의 write phase 에서 반영되었으므로 본 단계는 커밋만 담당한다. test/impl 은 impl-* 가 이미 커밋했고, push 는 사용자 명시 지시 후에만.
 ---
 

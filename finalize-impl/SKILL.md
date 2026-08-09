@@ -1,6 +1,6 @@
 ---
 name: finalize-impl
-model:
+model: gpt-sol
 description: (자동 파이프라인에서 제외됨 — 릴리스 노트가 별도로 필요할 때만 단독 호출) 구현(test/impl)이 커밋된 브랜치에서 release_manager 에이전트를 write phase·비격리로 spawn 해 _report.md(보고서, 검증 행 포함)를 작성까지만 시키는 thin wrapper. 작성이 끝나면 /commit-impl 로 자동 체인한다. /verify-impl 에서 체인되어 온 경우 _verify.md 의 종합 판정을 verify_verdict 로 전달(게이트 없음), 단독 호출이면 수동 검증완료 대기 후 진행. 이 스킬/agent 는 보고서 커밋을 하지 않으며(커밋은 /commit-impl), 구현 수정/브랜치 변경/push 는 하지 않는다.
 ---
 

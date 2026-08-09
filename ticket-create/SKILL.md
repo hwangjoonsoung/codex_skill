@@ -1,6 +1,6 @@
 ---
 name: ticket-create
-model:
+model: gpt-sol
 description: 요구사항을 ticket_writer 에이전트로 티켓 파일로 작성하는 thin wrapper. 자유 텍스트=단건(메인 세션이 모호점만 사용자에게 질문 후 ticket_writer 1개 spawn), feature-list .md 경로=일괄(메인 세션이 미구현 항목 파싱 → 항목당 ticket_writer 병렬 spawn). 티켓은 오늘 날짜(yyyymmdd) 디렉토리(docs/tickets/<yyyymmdd>/) 밑에 저장하며, 디렉토리가 없으면 생성한다. ticket 커밋은 하지 않으며(사용자 검토 후 /plan-impl Step 0 에서 자동 커밋), 브랜치 생성/구현은 하지 않는다.
 ---
 

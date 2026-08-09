@@ -1,6 +1,6 @@
 ---
-name: force-finalize-impl
-model:
+name: force-finalize-impl
+model: gpt-sol
 description: 현재 브랜치에서 정식 finalize-impl 사전조건(브랜치명 불일치, 이미 커밋된 worktree 변경분, 자동 빌드 실패 등)을 일부 만족하지 못하지만, 사용자가 수동 검증 완료를 명시했고 강제 마무리를 요청한 경우 보고서 작성과 보고서 커밋만 수행한다. 구현 수정, 브랜치 변경, push는 금지한다.
 ---
 

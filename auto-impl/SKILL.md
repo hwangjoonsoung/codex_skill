@@ -1,17 +1,18 @@
 ---
 name: auto-impl
-description: Automate a BOMS feature from one requirement, a feature-list Markdown file, or an existing ticket directory through ticket creation, plan generation, cross-ticket dependency analysis, dependency-aware parallel and sequential implementation, automated verification, repair retries, and serial integration into local dev for one final human review. Use when the user wants minimal-intervention implementation of multiple related Java project requirements without manually reviewing every ticket or repeatedly invoking plan-impl. Do not use board-* skills.
+model: gpt-sol
+description: 하나의 요구사항, feature-list Markdown 파일, 또는 기존 티켓 디렉터리에서 BOMS 기능을 자동 구현한다. 티켓 생성, 계획 수립, 티켓 간 의존성 분석, 의존성 기반 병렬/순차 구현, 자동 검증, 복구 재시도, 로컬 dev 직렬 통합을 거쳐 최종 사람 리뷰까지 수행한다. 사용자가 여러 Java 프로젝트 요구사항을 티켓마다 수동 검토하거나 plan-impl을 반복 호출하지 않고 최소 개입으로 구현하고 싶을 때 사용한다. board-* 스킬은 사용하지 않는다.
 ---
 
-# Auto Implement
+# 자동 구현
 
-## Purpose
+## 목적
 
-Run one resumable, dependency-aware implementation batch from requirements to a final human review on local `dev`. Reuse `ticket-create`, `plan-impl --no-chain`, the existing implementation agents, `verify-impl`, and the `integrator` agent. Keep `board-*`, `finalize-impl`, and `commit-impl` outside this pipeline.
+요구사항부터 로컬 `dev`의 최종 사람 리뷰까지, 재개 가능하고 의존성을 인지하는 구현 배치를 한 번에 실행한다. `ticket-create`, `plan-impl --no-chain`, 기존 구현 에이전트, `verify-impl`, `integrator` 에이전트를 재사용한다. `board-*`, `finalize-impl`, `commit-impl`은 이 파이프라인 밖에 둔다.
 
-Treat explicit invocation of this skill as authorization to create tickets, plans, feature branches, commits, verification evidence, and local `dev` integrations within the selected repository. Never push unless the user includes `--push`.
+이 스킬을 명시적으로 호출한 것은 선택된 저장소 안에서 티켓, 계획, 기능 브랜치, 커밋, 검증 증거, 로컬 `dev` 통합을 생성할 권한을 준 것으로 간주한다. 사용자가 `--push`를 포함하지 않는 한 절대 push하지 않는다.
 
-## Invocation
+## 호출
 
 ```text
 $auto-impl <requirement text | feature-list.md | ticket directory>
@@ -19,143 +20,143 @@ $auto-impl <input> [--push] [--max-repair <N>]
 $auto-impl --resume <execution-manifest.json> [--push]
 ```
 
-Defaults:
+기본값:
 
-- Integration target: local `dev`
-- Human gate: once after the batch reaches final review, plus a single consolidated question only when a true blocking ambiguity exists
-- Push: disabled
-- Repair retries: `2`
-- Automatic integration verdict: `PASS` only
+- 통합 대상: 로컬 `dev`
+- 사람 게이트: 배치가 최종 리뷰에 도달한 뒤 1회, 그리고 실제로 막는 모호점이 있을 때만 단일 통합 질문 1회
+- Push: 비활성화
+- 복구 재시도: `2`
+- 자동 통합 허용 판정: `PASS`만 허용
 
-## Invariants
+## 불변 조건
 
-1. Read the target repository's `AGENTS.md` files before changing it and follow their most specific applicable instructions.
-2. If Maven manages dependencies, do not attempt a Maven build or test. Record the skipped evidence; do not silently convert an incomplete verification into `PASS`.
-3. Preserve unrelated user changes. Never use `git add .`, `git add -A`, force checkout, force push, destructive reset, or broad cleanup.
-4. Let implementation agents change code only in their allowed ownership areas. The main session owns orchestration, the execution manifest, worktree lifecycle, and branch integration.
-5. Run implementation concurrently only for scheduler-ready tickets. Run verification one ticket at a time when it shares an app, port, browser, or database. Run integration strictly one ticket at a time.
-6. Do not let parallel agents write directly to `dev` or to the same worktree.
-7. Integrate only a verified verdict permitted by the manifest policy. Default to `PASS`; block `FAIL` and `INCONCLUSIVE`.
-8. Keep every feature branch until final review finishes. Do not delete failed worktrees automatically.
+1. 대상 저장소의 `AGENTS.md` 파일을 변경 전에 읽고, 적용 가능한 가장 구체적인 지시를 따른다.
+2. Maven이 의존성을 관리하는 경우 Maven 빌드나 테스트를 시도하지 않는다. 생략된 증거를 기록하고, 불완전한 검증을 조용히 `PASS`로 바꾸지 않는다.
+3. 관련 없는 사용자 변경을 보존한다. `git add .`, `git add -A`, 강제 checkout, 강제 push, 파괴적 reset, 광범위한 정리를 절대 사용하지 않는다.
+4. 구현 에이전트는 허용된 소유 영역 안에서만 코드를 변경하게 한다. 메인 세션은 오케스트레이션, 실행 매니페스트, worktree 수명주기, 브랜치 통합을 담당한다.
+5. 스케줄러가 준비됐다고 판단한 티켓만 동시에 구현한다. 같은 앱, 포트, 브라우저, 데이터베이스를 공유하는 검증은 티켓별로 한 번에 하나씩 실행한다. 통합은 반드시 티켓별로 하나씩 직렬 실행한다.
+6. 병렬 에이전트가 `dev`나 같은 worktree에 직접 쓰게 하지 않는다.
+7. 매니페스트 정책이 허용한 검증 판정만 통합한다. 기본값은 `PASS`이며, `FAIL`과 `INCONCLUSIVE`는 차단한다.
+8. 최종 리뷰가 끝날 때까지 모든 기능 브랜치를 유지한다. 실패한 worktree를 자동으로 삭제하지 않는다.
 
-## Phase 0: Preflight
+## Phase 0: 사전 점검
 
-1. Resolve the target Git repository from the input path or current directory. Stop if it is not a Git repository.
-2. Locate and read applicable `AGENTS.md` files.
-3. Confirm that local `dev` exists. Record `dev` HEAD, current branch, worktrees, and `git status --short`.
-4. If unrelated dirty changes prevent safe branch switching or integration, stop with the exact paths. Do not stash them automatically.
-5. When `origin/dev` exists, fetch it and compare it with local `dev`. Fast-forward a behind local `dev`; allow an intentionally ahead local `dev`; stop on divergence. Never reset local work.
-6. Check out local `dev` before ticket creation and planning. Stop rather than switching over unresolved dirty changes.
-7. Parse `--push` and `--max-repair`. Reject a negative retry value.
-8. Resolve this skill directory and the scheduler script path. Use absolute paths when invoking the script.
+1. 입력 경로나 현재 디렉터리에서 대상 Git 저장소를 결정한다. Git 저장소가 아니면 중단한다.
+2. 적용 가능한 `AGENTS.md` 파일을 찾아 읽는다.
+3. 로컬 `dev`가 있는지 확인한다. `dev` HEAD, 현재 브랜치, worktree 목록, `git status --short`를 기록한다.
+4. 관련 없는 dirty 변경 때문에 안전한 브랜치 전환이나 통합이 불가능하면 정확한 경로를 제시하고 중단한다. 자동으로 stash하지 않는다.
+5. `origin/dev`가 있으면 fetch한 뒤 로컬 `dev`와 비교한다. 로컬 `dev`가 뒤처졌으면 fast-forward하고, 의도적으로 앞서 있는 로컬 `dev`는 허용하며, diverge 상태면 중단한다. 로컬 작업을 절대 reset하지 않는다.
+6. 티켓 생성과 계획 수립 전에 로컬 `dev`를 checkout한다. 해결되지 않은 dirty 변경 위에서 전환하지 말고 중단한다.
+7. `--push`와 `--max-repair`를 파싱한다. 음수 재시도 값은 거부한다.
+8. 이 스킬 디렉터리와 스케줄러 스크립트 경로를 결정한다. 스크립트를 호출할 때는 절대 경로를 사용한다.
 
-## Phase 1: Produce tickets
+## Phase 1: 티켓 생성
 
-If the input is an existing ticket file or directory, collect only its direct ticket Markdown files and skip ticket creation.
+입력이 기존 티켓 파일 또는 디렉터리이면, 직속 티켓 Markdown 파일만 수집하고 티켓 생성을 건너뛴다.
 
-Otherwise follow `ticket-create/SKILL.md`:
+그 외에는 `ticket-create/SKILL.md`를 따른다.
 
-- For a feature-list path, use its bulk protocol.
-- For free text containing several independently testable requirements, split it into numbered requirement items and run the bulk ticket-writer protocol without forcing the user to approve each split.
-- For one requirement, use the single-ticket protocol.
-- Never let `ticket_writer` choose implementation route or dependency order.
+- feature-list 경로는 일괄 프로토콜을 사용한다.
+- 자유 텍스트에 독립적으로 테스트 가능한 요구사항이 여러 개 포함되어 있으면 번호가 붙은 요구사항 항목으로 나누고, 각 분할을 사용자에게 승인받도록 강제하지 않은 채 일괄 ticket-writer 프로토콜을 실행한다.
+- 요구사항이 하나이면 단일 티켓 프로토콜을 사용한다.
+- `ticket_writer`가 구현 route나 의존성 순서를 선택하게 하지 않는다.
 
-After creation, scan every ticket's Confirmation section. Classify unresolved items:
+생성 후 모든 티켓의 Confirmation 섹션을 스캔한다. 미해결 항목을 분류한다.
 
-- Resolve a reversible technical choice only when an applicable project rule or an explicit batch policy supplies the default. Record the rule or policy as the decision source.
-- Treat missing business behavior, destructive data changes, authorization/security semantics, and externally visible contract choices as blocking.
-- Present all blocking items in one consolidated question. Do not ask one question per ticket.
-- If no blocking item exists, continue without requiring the user to read the tickets.
+- 적용 가능한 프로젝트 규칙이나 명시적 배치 정책이 기본값을 제공할 때만 되돌릴 수 있는 기술 선택을 해결한다. 규칙 또는 정책을 결정 출처로 기록한다.
+- 누락된 비즈니스 동작, 파괴적 데이터 변경, 인가/보안 의미, 외부에 보이는 계약 선택은 blocking으로 취급한다.
+- 모든 blocking 항목을 하나의 통합 질문으로 제시한다. 티켓마다 질문하지 않는다.
+- blocking 항목이 없으면 사용자에게 티켓을 읽도록 요구하지 않고 계속한다.
 
-## Phase 2: Produce plans without implementation
+## Phase 2: 구현 없이 계획 생성
 
-Invoke `plan-impl <ticket directory> --no-chain`. Reuse existing plans and collect each successful ticket's:
+`plan-impl <ticket directory> --no-chain`을 호출한다. 기존 계획을 재사용하고 성공한 각 티켓에서 다음을 수집한다.
 
 - ticket path
 - plan path
-- route: `api`, `front`, or `fullstack`
+- route: `api`, `front`, 또는 `fullstack`
 - feature branch name
-- planned files, tables, APIs, and other shared resources
+- 계획된 파일, 테이블, API, 기타 공유 리소스
 
-Exclude planning failures from execution and record their exact reason. Do not invoke the normal `plan-impl` implementation chain because it does not schedule cross-ticket dependencies.
+계획 실패 티켓은 실행에서 제외하고 정확한 사유를 기록한다. 일반 `plan-impl` 구현 체인은 호출하지 않는다. 그 체인은 티켓 간 의존성 스케줄링을 하지 않기 때문이다.
 
-## Phase 3: Build the execution manifest
+## Phase 3: 실행 매니페스트 작성
 
-Read [references/execution-manifest.md](references/execution-manifest.md) before creating or editing a manifest.
+매니페스트를 만들거나 수정하기 전에 [references/execution-manifest.md](references/execution-manifest.md)를 읽는다.
 
-Read all selected tickets and plans as one batch. Derive:
+선택된 모든 티켓과 계획을 하나의 배치로 읽는다. 다음을 도출한다.
 
-- `depends_on`: required implementation predecessors
-- `resources`: files, tables, endpoints, configuration, ports, or other exclusive resources
-- `conflicts_with`: explicit ordering constraints not represented by a business dependency
-- `priority`: business priority when stated; otherwise `0`
+- `depends_on`: 반드시 먼저 구현되어야 하는 선행 작업
+- `resources`: 파일, 테이블, 엔드포인트, 설정, 포트, 기타 배타적 리소스
+- `conflicts_with`: 비즈니스 의존성으로 표현되지 않은 명시적 순서 제약
+- `priority`: 명시된 비즈니스 우선순위. 없으면 `0`
 
-Never use a standalone `parallel: true|false` flag. A ticket is parallel-ready only when all dependencies are integrated and it has no resource conflict with active work.
+독립적인 `parallel: true|false` 플래그는 절대 사용하지 않는다. 모든 의존성이 통합되었고 활성 작업과 리소스 충돌이 없을 때만 티켓은 병렬 준비 상태다.
 
-Store runtime state at:
+런타임 상태는 다음 위치에 저장한다.
 
 ```text
 <repo>/.codex/auto-impl/<batch-id>.json
 ```
 
-Do not stage or commit this runtime file. Create its parent directory if missing. Validate it before implementation:
+이 런타임 파일을 stage하거나 commit하지 않는다. 부모 디렉터리가 없으면 생성한다. 구현 전에 검증한다.
 
 ```text
 python <skill-dir>/scripts/dag_scheduler.py validate <manifest>
 ```
 
-Stop before implementation on unknown dependencies, duplicate ticket IDs, invalid states, or dependency cycles.
+알 수 없는 의존성, 중복 티켓 ID, 잘못된 상태, 의존성 cycle이 있으면 구현 전에 중단한다.
 
-## Phase 4: Schedule implementation
+## Phase 4: 구현 스케줄링
 
-Repeat until no runnable or active ticket remains.
+실행 가능한 티켓이나 활성 티켓이 남지 않을 때까지 반복한다.
 
-1. Ask the scheduler for the next ready set, limiting it to the currently available worker slots:
+1. 현재 사용 가능한 worker slot 수로 제한해 다음 ready set을 스케줄러에 요청한다.
 
    ```text
    python <skill-dir>/scripts/dag_scheduler.py ready <manifest> --limit <available-worker-slots>
    ```
 
-2. Before spawning a worker, transition the ticket to `RUNNING` and record the current local `dev` SHA as `base_ref`:
+2. worker를 spawn하기 전에 티켓을 `RUNNING`으로 전환하고 현재 로컬 `dev` SHA를 `base_ref`로 기록한다.
 
    ```text
    python <skill-dir>/scripts/dag_scheduler.py transition <manifest> <ticket-id> RUNNING --base-ref <sha> --branch <branch>
    ```
 
-3. Spawn ready tickets concurrently up to the available slots, with one isolated worktree per ticket. State explicit file ownership and tell every worker that other agents are active and must not revert their changes.
-4. Use the plan route:
-   - `api`: spawn `backend_engineer`.
-   - `front`: spawn `frontend_engineer`.
-   - `fullstack`: use one shared ticket worktree; run `backend_engineer`, wait for success, then run `frontend_engineer` on the same branch. Different fullstack tickets may run concurrently when the scheduler declares them ready and resources do not conflict.
-5. Require structured results containing result, branch, commit SHAs, validation status, and notes.
-6. On success, transition `RUNNING -> IMPLEMENTED`. On failure, transition to `REPAIR` when retries remain; otherwise transition to `FAILED`.
-7. Remove a successful implementation worktree before non-isolated verification so the feature branch can be checked out. Keep failed worktrees for inspection.
+3. 준비된 티켓을 사용 가능한 slot 수까지 동시에 spawn하되, 티켓마다 격리된 worktree 하나를 사용한다. 명시적인 파일 소유권을 전달하고, 모든 worker에게 다른 에이전트도 활성 상태이므로 그들의 변경을 되돌리지 말라고 알린다.
+4. 계획 route를 사용한다.
+   - `api`: `backend_engineer`를 spawn한다.
+   - `front`: `frontend_engineer`를 spawn한다.
+   - `fullstack`: 하나의 공유 티켓 worktree를 사용한다. `backend_engineer`를 실행해 성공을 기다린 뒤 같은 브랜치에서 `frontend_engineer`를 실행한다. 서로 다른 fullstack 티켓은 스케줄러가 ready로 판단하고 리소스 충돌이 없으면 동시에 실행할 수 있다.
+5. 결과, 브랜치, 커밋 SHA, 검증 상태, 메모를 포함한 구조화된 결과를 요구한다.
+6. 성공하면 `RUNNING -> IMPLEMENTED`로 전환한다. 실패하면 재시도가 남아 있을 때 `REPAIR`로 전환하고, 그렇지 않으면 `FAILED`로 전환한다.
+7. 비격리 검증 전에 성공한 구현 worktree를 제거해 기능 브랜치를 checkout할 수 있게 한다. 실패한 worktree는 점검을 위해 유지한다.
 
-Treat each selected ready set as one implementation wave. Keep local `dev` fixed at the recorded `base_ref` until every worker in that wave has finished and its feature branch is proven to descend from that SHA. Do not verify, integrate, or otherwise advance `dev` while a wave still has an active implementation worker. This preserves the existing engineer contract that creates branches from local `dev`.
+선택된 ready set 하나를 구현 wave 하나로 취급한다. 해당 wave의 모든 worker가 끝나고 각 기능 브랜치가 기록된 SHA에서 파생됐음이 증명될 때까지 로컬 `dev`를 기록된 `base_ref`에 고정한다. wave 안에 활성 구현 worker가 남아 있는 동안 `dev`를 검증, 통합 또는 그 밖의 방식으로 전진시키지 않는다. 이렇게 해야 로컬 `dev`에서 브랜치를 만드는 기존 engineer 계약이 유지된다.
 
-After the wave finishes, verify and integrate its successful tickets serially. A later ticket in the same wave may have started from the older wave base; the integrator must merge the latest local `dev` into that feature branch before fast-forwarding `dev`.
+wave가 끝난 뒤 성공한 티켓을 직렬로 검증하고 통합한다. 같은 wave의 나중 티켓은 더 오래된 wave base에서 시작했을 수 있다. integrator는 로컬 `dev`를 fast-forward하기 전에 최신 로컬 `dev`를 해당 기능 브랜치에 merge해야 한다.
 
-## Phase 5: Verify and repair
+## Phase 5: 검증과 복구
 
-Verify implemented tickets one at a time:
+구현된 티켓을 하나씩 검증한다.
 
-1. Transition `IMPLEMENTED -> VERIFYING`.
-2. Invoke `verify-impl <ticket path>` and parse its `PASS`, `FAIL`, or `INCONCLUSIVE` verdict and report path.
-3. On `PASS`, transition to `VERIFIED` and record the verification commit.
-4. On `FAIL`, transition to `REPAIR` when repair retries remain. Recreate an isolated worktree on the existing feature branch and send the applicable implementation agent the ticket, plan, verification report, existing branch, and `mode: repair`. Require a new repair commit, then verify again.
-5. On `INCONCLUSIVE`, retry only a clearly transient verification failure once. Otherwise transition to `BLOCKED`; never integrate it under the default policy.
-6. If the existing implementation agent cannot resume an existing branch, mark the ticket `BLOCKED` with `REPAIR_UNSUPPORTED` instead of creating an unrelated replacement branch.
-7. After each verifier run, require a clean feature branch and check out local `dev` so the feature branch is free for a repair or integrator worktree. If unexpected dirty files remain, stop that ticket and report the exact paths.
+1. `IMPLEMENTED -> VERIFYING`으로 전환한다.
+2. `verify-impl <ticket path>`를 호출하고 `PASS`, `FAIL`, `INCONCLUSIVE` 판정과 보고서 경로를 파싱한다.
+3. `PASS`이면 `VERIFIED`로 전환하고 검증 커밋을 기록한다.
+4. `FAIL`이면 복구 재시도가 남아 있을 때 `REPAIR`로 전환한다. 기존 기능 브랜치에 격리 worktree를 다시 만들고, 적용 가능한 구현 에이전트에게 티켓, 계획, 검증 보고서, 기존 브랜치, `mode: repair`를 보낸다. 새 repair 커밋을 요구한 뒤 다시 검증한다.
+5. `INCONCLUSIVE`이면 명확히 일시적인 검증 실패일 때만 한 번 재시도한다. 그렇지 않으면 `BLOCKED`로 전환한다. 기본 정책에서는 절대 통합하지 않는다.
+6. 기존 구현 에이전트가 기존 브랜치를 재개할 수 없으면 관련 없는 대체 브랜치를 만들지 말고 `REPAIR_UNSUPPORTED` 사유로 티켓을 `BLOCKED` 처리한다.
+7. 각 verifier 실행 후 기능 브랜치가 clean인지 요구하고, repair 또는 integrator worktree가 해당 기능 브랜치를 사용할 수 있도록 로컬 `dev`를 checkout한다. 예상치 못한 dirty 파일이 남으면 해당 티켓을 중단하고 정확한 경로를 보고한다.
 
-Continue unrelated ready tickets while descendants of `FAILED` or `BLOCKED` tickets remain unavailable.
+`FAILED` 또는 `BLOCKED` 티켓의 하위 티켓이 계속 사용할 수 없는 상태여도, 관련 없는 ready 티켓은 계속 진행한다.
 
-## Phase 6: Integrate verified tickets into local dev
+## Phase 6: 검증된 티켓을 로컬 dev에 통합
 
-Process the integration queue serially.
+통합 큐를 직렬 처리한다.
 
-1. Transition `VERIFIED -> INTEGRATING`.
-2. Confirm that the main workspace is clean and has local `dev` checked out.
-3. Ensure the feature branch contains the current local `dev` by spawning `integrator` in an isolated worktree with:
+1. `VERIFIED -> INTEGRATING`으로 전환한다.
+2. 메인 workspace가 clean이고 로컬 `dev`가 checkout되어 있는지 확인한다.
+3. 기능 브랜치가 현재 로컬 `dev`를 포함하도록, 다음 입력으로 격리 worktree에서 `integrator`를 spawn한다.
 
    ```json
    {
@@ -166,52 +167,52 @@ Process the integration queue serially.
    }
    ```
 
-4. Let `integrator` resolve only unambiguous conflicts and run validations allowed by `AGENTS.md`. Stop that ticket on an ambiguous conflict or invalid result.
-5. After integrator success, confirm that current `dev` is an ancestor of the feature branch.
-6. Advance local `dev` only with `git merge --ff-only <feature-branch>`. Never create a merge commit on `dev`, and never force it.
-7. Record the new `dev` SHA and transition `INTEGRATING -> INTEGRATED`.
-8. Let the scheduler unlock descendants only after this transition.
+4. `integrator`는 모호하지 않은 충돌만 해결하고 `AGENTS.md`가 허용한 검증을 실행하게 한다. 모호한 충돌이나 잘못된 결과가 있으면 해당 티켓을 중단한다.
+5. integrator 성공 후 현재 `dev`가 기능 브랜치의 ancestor인지 확인한다.
+6. `git merge --ff-only <feature-branch>`로만 로컬 `dev`를 전진시킨다. `dev`에 merge commit을 만들지 말고 절대 강제하지 않는다.
+7. 새 `dev` SHA를 기록하고 `INTEGRATING -> INTEGRATED`로 전환한다.
+8. 이 전환 이후에만 스케줄러가 하위 티켓을 unlock하게 한다.
 
-If integration fails, leave local `dev` at its previous SHA and move the ticket to `REPAIR` or `FAILED`. Continue unrelated tickets.
+통합에 실패하면 로컬 `dev`를 이전 SHA에 그대로 두고 티켓을 `REPAIR` 또는 `FAILED`로 이동한다. 관련 없는 티켓은 계속 진행한다.
 
-## Phase 7: Finish or pause
+## Phase 7: 완료 또는 일시 중지
 
-Run the scheduler summary:
+스케줄러 요약을 실행한다.
 
 ```text
 python <skill-dir>/scripts/dag_scheduler.py summary <manifest>
 ```
 
-- If ready work remains, continue Phase 4.
-- If only failed or blocked ancestors remain, report them once with their blocked descendants and stop for user input.
-- When every ticket is `INTEGRATED`, optionally run an aggregate verification allowed by project rules.
-- If `--push` was supplied, fetch `origin/dev`, require local `dev` to contain it without divergence, and push local `dev` once at batch end. Never force-push.
-- Present one final review containing the local dev SHA, push status, ticket results, assumptions, skipped Maven evidence, and verification report paths.
+- ready 작업이 남아 있으면 Phase 4를 계속한다.
+- 실패했거나 차단된 선행 티켓만 남아 있으면 해당 티켓과 차단된 하위 티켓을 한 번 보고하고 사용자 입력을 기다린다.
+- 모든 티켓이 `INTEGRATED`가 되면 프로젝트 규칙이 허용하는 집계 검증을 선택적으로 실행한다.
+- `--push`가 제공되었으면 `origin/dev`를 fetch하고, 로컬 `dev`가 diverge 없이 `origin/dev`를 포함해야 하며, 배치 끝에 로컬 `dev`를 한 번 push한다. 절대 force-push하지 않는다.
+- 로컬 dev SHA, push 상태, 티켓 결과, 가정, 생략된 Maven 증거, 검증 보고서 경로를 포함한 최종 리뷰 하나를 제시한다.
 
-Wait for one human decision:
+사람의 결정 하나를 기다린다.
 
-- Approval: transition all `INTEGRATED` tickets to `DONE` and finish.
-- Revision feedback: create only the necessary revision tickets, plan them, append them to the same manifest with dependencies on the affected integrated tickets, validate the graph, and resume Phase 4. Prefer fix-forward; do not revert existing work unless explicitly requested.
+- 승인: 모든 `INTEGRATED` 티켓을 `DONE`으로 전환하고 완료한다.
+- 수정 피드백: 필요한 수정 티켓만 만들고, 계획을 세우며, 영향을 받은 통합 티켓에 의존하도록 같은 매니페스트에 추가하고, 그래프를 검증한 뒤 Phase 4를 재개한다. 기존 작업을 되돌리기보다 fix-forward를 선호한다. 명시적으로 요청받지 않는 한 revert하지 않는다.
 
-## Resume
+## 재개
 
-For `--resume`:
+`--resume`의 경우:
 
-1. Validate the manifest.
-2. Compare recorded branch and commit SHAs with actual Git refs.
-3. Reconcile only facts that can be proven from commits and verification reports.
-4. Do not infer that an interrupted `RUNNING`, `VERIFYING`, or `INTEGRATING` action succeeded. Inspect its branch/worktree and either complete the state transition from evidence or mark it `BLOCKED` with the reason.
-5. Continue from the scheduler's ready set.
+1. 매니페스트를 검증한다.
+2. 기록된 브랜치와 커밋 SHA를 실제 Git ref와 비교한다.
+3. 커밋과 검증 보고서로 증명할 수 있는 사실만 조정한다.
+4. 중단된 `RUNNING`, `VERIFYING`, `INTEGRATING` 작업이 성공했다고 추론하지 않는다. 해당 브랜치/worktree를 검사하고 증거로 상태 전환을 완료하거나 사유와 함께 `BLOCKED`로 표시한다.
+5. 스케줄러의 ready set부터 계속한다.
 
-## Existing skill boundaries
+## 기존 스킬 경계
 
-- Use `ticket-create` for ticket-writing rules.
-- Use `plan-impl --no-chain` only for ticket plans and routes.
-- Do not call `impl-api` or `impl-front` wrappers from this pipeline; spawn their underlying engineer roles directly so the scheduler controls readiness and worktrees.
-- Use `verify-impl` for ticket verification, but treat its verdict as input to this pipeline instead of a terminal report.
-- Do not call `merge-impl` per ticket. Its contract requires prior human approval and targets final standalone integration.
-- Leave `finalize-impl` and `commit-impl` optional and outside the automatic pipeline.
+- 티켓 작성 규칙에는 `ticket-create`를 사용한다.
+- 티켓 계획과 route에는 `plan-impl --no-chain`만 사용한다.
+- 이 파이프라인에서 `impl-api` 또는 `impl-front` wrapper를 호출하지 않는다. 스케줄러가 readiness와 worktree를 제어할 수 있도록 하위 engineer role을 직접 spawn한다.
+- 티켓 검증에는 `verify-impl`을 사용하되, 그 판정을 터미널 보고서가 아니라 이 파이프라인의 입력으로 취급한다.
+- 티켓별로 `merge-impl`을 호출하지 않는다. 그 계약은 사전 사람 승인을 요구하며 최종 독립 통합을 대상으로 한다.
+- `finalize-impl`과 `commit-impl`은 선택 사항이며 자동 파이프라인 밖에 둔다.
 
-## Deterministic scheduler
+## 결정론적 스케줄러
 
-Use `scripts/dag_scheduler.py` for validation, ready selection, state transitions, and summaries. Do not manually bypass a rejected transition. The script prioritizes explicit priority and longer dependency chains, prevents cyclic graphs, and excludes conflicting resources from the same ready set.
+검증, ready 선택, 상태 전환, 요약에는 `scripts/dag_scheduler.py`를 사용한다. 거부된 전환을 수동으로 우회하지 않는다. 이 스크립트는 명시적 priority와 더 긴 dependency chain을 우선시하고, 순환 그래프를 방지하며, 충돌하는 리소스가 같은 ready set에 포함되지 않게 한다.

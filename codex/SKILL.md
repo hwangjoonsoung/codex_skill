@@ -1,6 +1,6 @@
 ---
-name: codex
-model:
+name: codex
+model: gpt-sol
 preamble-tier: 3
 version: 1.0.0
 description: |

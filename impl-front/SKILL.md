@@ -1,6 +1,6 @@
 ---
 name: impl-front
-model:
+model: gpt-sol
 description: plan.md 가 준비된 티켓(파일=단건 / 디렉토리=N건)에 대해 티켓당 frontend_engineer 에이전트를 격리 worktree 로 spawn 해 templates/static 구현 + compileJava + 1커밋을 시키는 thin wrapper. 구현이 끝나면 성공 티켓마다 /verify-impl 로 자동 체인하며, verify 가 _verify.md 를 커밋하면 파이프라인이 종료된다(이후 체인 없음). route 가 front 인 티켓만 처리하며 /impl-api·fullstack 은 안내 후 스킵. 신규 API 가 필요하면 frontend_engineer 가 즉시 중단하고 /impl-api 를 안내한다. 메인 세션은 코드/브랜치를 직접 건드리지 않고 agent spawn·worktree 정리·체인만 담당한다.
 ---
 

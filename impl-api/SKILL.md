@@ -1,6 +1,6 @@
 ---
 name: impl-api
-model:
+model: gpt-sol
 description: plan.md 가 준비된 티켓(파일=단건 / 디렉토리=N건)에 대해 티켓당 backend_engineer 에이전트를 격리 worktree 로 spawn 해 백엔드 TDD/빌드/2커밋(test+impl)을 시키는 thin wrapper. 구현이 끝나면 성공 티켓마다 /verify-impl 로 자동 체인하며, verify 가 _verify.md 를 커밋하면 파이프라인이 종료된다(이후 체인 없음). route 가 api 인 티켓만 처리하며 /impl-front·fullstack 은 안내 후 스킵. 메인 세션은 코드/브랜치를 직접 건드리지 않고 agent spawn·worktree 정리·체인만 담당한다.
 ---
 

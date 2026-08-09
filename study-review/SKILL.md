@@ -1,6 +1,6 @@
 ---
-name: study-review
-model:
+name: study-review
+model: gpt-sol
 description: 학습 커리큘럼(docs/nginx, docs/docker, docs/network 등)의 dayXX.md 작성 내용을 리뷰한다. 빈칸 여부와 기술 정확성으로 PASS/BLOCK 을 판정하고, 원칙 승격 확인까지 수행한 뒤 아쉬운 점을 해당 파일의 "리뷰 피드백" 섹션에 상태 마커 체크박스로 기록한다. 재리뷰 시 사용자가 입력한 상태([done]/[hold]/[no action])에 따라 done 은 재검증하고, hold 항목과 추가 실험 제안은 커리큘럼 루트 HOLD.md 에 처리 시점과 함께 모아 정리한다. 판정이 PASS 면 리뷰 결과를 자동 커밋·푸시한다. 답을 대신 채워주지 않는다.
 argument-hint: <dayXX.md 파일 경로 또는 day 디렉토리 경로>
 ---

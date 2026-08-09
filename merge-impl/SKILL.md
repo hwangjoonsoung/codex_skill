@@ -1,6 +1,6 @@
 ---
 name: merge-impl
-model:
+model: gpt-sol
 description: "verify-impl(자동 검증)과 사람 검증까지 끝난 feature 브랜치를 로컬 dev 에 통합하는 파이프라인 종단 스킬. 충돌은 integrator 에이전트가 feature 브랜치 위에서 최신 origin/dev 를 병합해 해소하고(모호하면 중단), 메인 세션은 충돌이 불가능한 clean fast-forward 로만 로컬 dev 를 전진시킨 뒤 origin/dev 로 push 한다. dev 는 항상 깨끗하게만 전진하며, main PR/머지는 이 스킬 밖(수동)이다. `--no-push` 로 로컬 dev ff 까지만, `--yes` 로 확인 게이트 생략."
 ---
 

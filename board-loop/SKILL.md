@@ -1,6 +1,6 @@
 ---
 name: board-loop
-model:
+model: gpt-sol
 description: feature-board 큐(step_state=QUEUED)를 폴링해 처리할 board 를 1건씩 디스패치하는 워커 틱. status=START 면 /board-ticket, status=CONFIRMATION_CHECK 이고 confirmation 전부 선택됐으면 /board-plan 으로 분기한다. RUNNING 은 skip, 오래된 RUNNING 은 stale 로 보고만 한다. 매 틱이 board API 를 새로 읽는 stateless 구조라 호스트 cron + fresh `claude -p "/board-loop"` 로 무인 구동한다. 설계 SSOT=BOARD_SKILL_DESIGN.md §6.
 ---
 

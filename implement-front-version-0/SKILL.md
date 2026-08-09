@@ -1,7 +1,7 @@
 ---
 name: implement-front
-model:
-codex-model: gpt-5.3-codex
+model: gpt-sol
+codex-model: gpt-sol
 description: 티켓 기반 프론트엔드 전용 구현 워크플로우. docs/tickets/의 티켓을 받아 브랜치 생성 → 구현(템플릿/CSS/JS만) → 빌드 검증 → 보고서 작성 → 사용자 수동 브라우저 검증 대기 → 검증완료 반영 → 단계별 로컬 커밋까지 자동으로 수행한다. 백엔드 코드(`src/main/java/**`)와 DB 스키마, 설정 파일은 절대 수정하지 않는다. push 는 사용자 명시 지시 후에만 실행한다.
 ---
 

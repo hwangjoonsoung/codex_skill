@@ -1,6 +1,6 @@
 ---
 name: qna-summary
-model:
+model: gpt-sol
 allowed-tools: Write, Read, Glob, Bash(mkdir -p ~/Desktop/obsidan/*), Bash(ls ~/Desktop/obsidan*), Bash(git -C ~/Desktop/obsidan status:*), Bash(git -C ~/Desktop/obsidan add:*), Bash(git -C ~/Desktop/obsidan commit:*), Bash(git -C ~/Desktop/obsidan push:*), Bash(git -C ~/Desktop/obsidan rev-parse:*), Bash(git -C ~/Desktop/obsidan log:*)
 description: 현재 세션에서 사용자가 질문했던 내용을 주제별로 분리해 markdown 파일로 정리한다. 한 세션에 여러 주제가 섞여 있을 수 있고(주제 간 연관 있을 수도/없을 수도), 각 주제마다 별도 파일을 생성한다. 각 파일은 제목/주제(운영·개발·디자인·ai 등 다중 선택)/개요/내용(정리)/결론 형식을 따른다. 저장 경로는 `~/Desktop/obsidan/{분류}/{대주제}/` 로 질문 내용에 맞춰 스킬이 스스로 정한다(예: nginx 질문 → `~/Desktop/obsidan/develop/nginx/`).
 ---

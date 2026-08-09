@@ -1,7 +1,7 @@
 ---
 name: error-ticket-create
-model:
-codex-model: gpt-5.5
+model: gpt-sol
+codex-model: gpt-sol
 description: 원본 티켓이 commit-push-merge 까지 끝난 뒤 발생한 오류를 받아 docs/error/_template.md 포맷의 에러 티켓을 docs/error/<원본티켓>_error.md 로 생성한다. §1 증상, §2 의도·실제·수정방향, §3 근본 원인까지 채우고 후속 /impl-api 또는 /impl-front 를 안내한다. 브랜치 생성/구현/커밋은 수행하지 않는다.
 ---
 

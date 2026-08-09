@@ -1,6 +1,6 @@
 ---
 name: verify-impl
-model:
+model: gpt-sol
 description: 구현(test/impl)이 커밋된 브랜치에서 verifier 에이전트를 비격리로 spawn 해 티켓 §9 Verification 을 자동 실행하고 docs/verify/<날짜>/<NAME>_verify.md 에 증거(호출/응답/DB/스크린샷)를 수집·자동 확인 행 기록·_verify.md 1커밋까지 시키는 thin wrapper. verifier 가 _verify.md 를 커밋하면 여기서 파이프라인이 종료된다(체인 없음). PASS/FAIL/INCONCLUSIVE 판정은 보고만 한다. 최종 수동 검증은 사용자 몫이며, 만족하면 사용자가 /merge-impl 을 직접 호출하고 불만족 시 새 티켓으로 재작업한다. /impl-api·/impl-front 직후 또는 그 체인에서 호출된다. 구현 코드 수정/push 는 하지 않는다(커밋은 verifier 가 _verify.md 문서 1건만).
 ---
 

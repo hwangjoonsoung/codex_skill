@@ -1,6 +1,6 @@
 ---
 name: board-ticket
-model:
+model: gpt-sol
 description: feature-board(웹/DB) 게시글 id 를 받아 Run 1(워크플로우 1→3단계)을 수행하는 board 연동 래퍼. board 상세를 읽어 requirement 로 ticket_writer 를 spawn 해 티켓을 만들고, status 를 TICKET_CREATE→CONFIRMATION_CHECK 로 PATCH 하며, 생성 티켓 §8 확인사항을 board confirmation 으로 POST 한다. confirmation 이 0개면 CONFIRMATION_COMPLETE 까지 전이 후 /board-plan 으로 자동 연속한다. 기존 ticket-create/plan-impl 은 고치지 않고 감싼다(wrap). 설계 SSOT=BOARD_SKILL_DESIGN.md.
 ---
 
